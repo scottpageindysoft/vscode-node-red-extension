@@ -1,0 +1,6 @@
+/.DS_Store
+/node-red
+/node_modules
+/out
+vscode.d.ts
+vscode.proposed.d.ts

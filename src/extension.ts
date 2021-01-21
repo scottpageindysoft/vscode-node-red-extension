@@ -58,7 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		app.get('/red/red/red.js', async (_, res) => {
 			const redJsFileBuffer = await fsExtra.readFile(path.join(__dirname, '..', 'node_modules', '@node-red', 'editor-client', 'public', 'red', 'red.js'));
-			const redJsFileContentsString = redJsFileBuffer.toString().replace('var port = 65000;', `var port = ${listenPort};`);
+			const redJsFileContentsString = redJsFileBuffer.toString().replace('var path = location.hostname;', `var path = '127.0.0.1';`).replace('var port = location.port;', `var port = ${listenPort}`).replace('path = path+document.location.pathname;', `path = path+'/red'`);
 			return res.send(redJsFileContentsString);
 		});
 
