@@ -1,4 +1,4 @@
-# Proposed API Sample
+# VS Code extension with node-red server and UI editor
 
 This sample demonstrates usage of [Proposed API](https://code.visualstudio.com/api/advanced-topics/using-proposed-api).
 
