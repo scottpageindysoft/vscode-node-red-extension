@@ -32,7 +32,7 @@ import path from 'path';
 let server: http.Server | undefined;
 let app: express.Express | undefined;
 let nodeRedWebViewPanel: vscode.WebviewPanel | undefined;
-let listenPort = 0;
+let listenPort = 0; // This will contain the port the OS assigns the HTTP server when it starts listening.  We use this to dynamically update all of the dependent code as to which port to connect to
 
 const nodeRedSettings: NodeRedSettings = {
 	httpAdminRoot: '/red',
@@ -48,12 +48,13 @@ const nodeRedSettings: NodeRedSettings = {
 export function activate(context: vscode.ExtensionContext) {
 	if (!app) {
 		app = express();
-		app.use((req, _, next) => {
-			console.info(req.url);
-			next();
-		});
+		// Uncomment the following to see all request URLs in the console
+		// app.use((req, _, next) => {
+		// 	console.info(req.url);
+		// 	next();
+		// });
 		app.use(cors());
-		app.use('/', express.static('public'));
+		app.use('/', express.static('public')); // This dir doesn't exist, so we may get errors, but it's here for future use
 		server = http.createServer(app);
 
 		app.get('/red/red/red.js', async (_, res) => {
@@ -64,8 +65,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 		server.listen(listenPort, async () => {
 			listenPort = server ? (server.address() as AddressInfo).port : 0;
-			vscode.window.showInformationMessage(`Listening on port ${listenPort}`);
-			if (!server || !app) return;
+			const listenMessage = `Listening on port ${listenPort}`;
+			console.info(listenMessage); // Log this to the console so we can easily find it later
+			vscode.window.showInformationMessage(listenMessage);
+			if (!server || !app) return; // This won't happen, but keeps TypeScript happy
 			nodeRedSettings.uiPort = listenPort;
 			RED.init(server, nodeRedSettings);
 			if (nodeRedSettings.httpAdminRoot) app.use(nodeRedSettings.httpAdminRoot, RED.httpAdmin);
@@ -73,8 +76,6 @@ export function activate(context: vscode.ExtensionContext) {
 			await RED.start();
 		});
 	}
-	console.log('Congratulations, your extension "proposed-api-sample" is now active!');
-
 	/**
 	 * You can use proposed API here. `vscode.` should start auto complete
 	 * Proposed API as defined in vscode.proposed.d.ts.
